@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
         UpdateCamAndPlayer();
         targetPlayerRotation = curPlayerRotation;
 
-        GetComponent<MeshRenderer>().enabled = false; // make player invisibale to the camera
+        GetComponent<MeshRenderer>().enabled = false; // make player invisible to the camera
 
     }
 
@@ -125,7 +125,7 @@ public class Player : MonoBehaviour
     {
         if(collision.gameObject.tag == "Wall")
         {
-            newPlayerPosition = lastPlayerPos; // if you hit that wall change the target position to the plaers last position
+            newPlayerPosition = lastPlayerPos; // if you hit that wall change the target position to the players last position
         }
     }
 }

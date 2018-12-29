@@ -10,6 +10,8 @@ public class brick_shade : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // randomly set a gray shade for the individual bricks in the wall
+
         int rgbColor = Random.Range(50, 100);
         GetComponent<Renderer>().material.color = new Color32((byte)rgbColor, (byte)rgbColor, (byte)rgbColor, 255);
 
