@@ -19,10 +19,16 @@ public class Player : MonoBehaviour
     [SerializeField] bool isMoving = false;
     [SerializeField] bool isPlayerLooking = false;
     // for camera look
-    [SerializeField] float camSpeedH = 2.0f;
-    [SerializeField] float camSpeedV = 2.0f;
+    [SerializeField] float camLookSpeed = 2.0f;
+    
     float cameraYaw = 0f;
     float cameraPitch = 0f;
+
+    Vector2 curMousePos;
+
+    enum direction {north, south, east, west };
+
+    direction playerFacing;
    
     // Start is called before the first frame update
     void Start()
@@ -38,6 +44,8 @@ public class Player : MonoBehaviour
         targetPlayerRotation = curPlayerRotation;
 
         GetComponent<MeshRenderer>().enabled = false; // make player invisible to the camera
+       
+        GetPlayerDirection();
         
     }
 
@@ -45,10 +53,40 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        curMousePos.x += Input.GetAxis("Mouse X");
+        //curMousePos.x = Input.mousePosition.x;
+        curMousePos.y += -Input.GetAxis("Mouse Y");
+        //curMousePos.y = Input.mousePosition.y;
+        print(playerFacing);
         PlayerInput();
         UpdateCamAndPlayer();
-        
-       
+
+    }
+
+    private void GetPlayerDirection()
+    {
+        if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 0)
+        {
+            playerFacing = direction.north;
+            cameraYaw = 0f;
+            
+        }
+        if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 270)
+        {
+            playerFacing = direction.west;
+            cameraYaw = -90f;
+        }
+        if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 180)
+        {
+            playerFacing = direction.south;
+            cameraYaw = 180f;
+        }
+        if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 90)
+        {
+            playerFacing = direction.east;
+            cameraYaw = 90f;
+        }
+        cameraPitch = 0f;
     }
 
     private void UpdateCamAndPlayer()
@@ -76,6 +114,7 @@ public class Player : MonoBehaviour
         // when all the moving is done give control back to the player
         if (curPlayerPos == newPlayerPosition && curPlayerRotation == targetPlayerRotation && isPlayerLooking == false)
         {
+            GetPlayerDirection();
             isMoving = false;
         }
     }
@@ -107,18 +146,14 @@ public class Player : MonoBehaviour
         {
             if (isPlayerLooking == false)
             {
-                // this is to keep the camera from popping to the last mouse looked position **** this is not working right ******
-                //TODO get this working
-                cameraYaw = Input.GetAxis("Mouse X");
-                cameraPitch = Input.GetAxis("Mouse Y");
                 isMoving = true;
             }
+            GetPlayerDirection();
             MouseLook();
         }
         else if (!Input.GetKey(KeyCode.L) && isPlayerLooking == true)
         {
-            isPlayerLooking = false;
-            
+            isPlayerLooking = false;   
         }
 
     }
@@ -126,9 +161,12 @@ public class Player : MonoBehaviour
     private void MouseLook()
     {
         isPlayerLooking = true;
-        cameraYaw += camSpeedH * Input.GetAxis("Mouse X");
-        cameraPitch -= camSpeedV * Input.GetAxis("Mouse Y");
-        playerCamera.transform.eulerAngles = new Vector3(cameraPitch, cameraYaw, 0f);
+        if (cameraYaw < 180f && cameraYaw > -180f)
+        {
+            cameraYaw += camLookSpeed * curMousePos.x;
+            cameraPitch += camLookSpeed * curMousePos.y;
+            playerCamera.transform.rotation = Quaternion.Euler(cameraPitch, cameraYaw, 0f);
+        }
     }
 
     private void RotatePlayerCW()
@@ -143,6 +181,7 @@ public class Player : MonoBehaviour
         
         targetPlayerRotation = curPlayerRotation * playerRotationCCW;
         isMoving = true;
+        
     }
 
     private void MoveForward()
