@@ -17,10 +17,19 @@ public class Player : MonoBehaviour
     Quaternion curPlayerRotation;
     Quaternion targetPlayerRotation;
     [SerializeField] bool isMoving = false;
+    [SerializeField] bool isPlayerLooking = false;
+    // for camera look
+    [SerializeField] float camSpeedH = 2.0f;
+    [SerializeField] float camSpeedV = 2.0f;
+    float cameraYaw = 0f;
+    float cameraPitch = 0f;
    
     // Start is called before the first frame update
     void Start()
     {
+        // console instructions
+        print("W,A,S,D to move and turn. L to mouse look");
+
         // start of level setup
         curPlayerRotation = transform.rotation;
         newPlayerPosition = GetComponent<Transform>().position;
@@ -29,7 +38,7 @@ public class Player : MonoBehaviour
         targetPlayerRotation = curPlayerRotation;
 
         GetComponent<MeshRenderer>().enabled = false; // make player invisible to the camera
-
+        
     }
 
 
@@ -38,6 +47,8 @@ public class Player : MonoBehaviour
     {
         PlayerInput();
         UpdateCamAndPlayer();
+        
+       
     }
 
     private void UpdateCamAndPlayer()
@@ -58,10 +69,12 @@ public class Player : MonoBehaviour
         
         // make the camera match the player
         playerCamera.transform.position = new Vector3(curPlayerPos.x, curPlayerPos.y + playerCameraHight, curPlayerPos.z); // update the camera to players position with hight offset
-        playerCamera.transform.rotation = curPlayerRotation; // update the camera to players rotation local z is forward
-        
+        if (isPlayerLooking == false)
+        {
+            playerCamera.transform.rotation = Quaternion.Slerp(playerCamera.transform.rotation, curPlayerRotation , rSpeed); //rotate camera to player rotation... only executes if player is not in mouse look
+        }
         // when all the moving is done give control back to the player
-        if (curPlayerPos == newPlayerPosition && curPlayerRotation == targetPlayerRotation)
+        if (curPlayerPos == newPlayerPosition && curPlayerRotation == targetPlayerRotation && isPlayerLooking == false)
         {
             isMoving = false;
         }
@@ -88,9 +101,35 @@ public class Player : MonoBehaviour
             {
                 MoveBackwards();
             }
+
         }
+        if(Input.GetKey(KeyCode.L))
+        {
+            if (isPlayerLooking == false)
+            {
+                // this is to keep the camera from popping to the last mouse looked position **** this is not working right ******
+                //TODO get this working
+                cameraYaw = Input.GetAxis("Mouse X");
+                cameraPitch = Input.GetAxis("Mouse Y");
+                isMoving = true;
+            }
+            MouseLook();
+        }
+        else if (!Input.GetKey(KeyCode.L) && isPlayerLooking == true)
+        {
+            isPlayerLooking = false;
+            
+        }
+
     }
 
+    private void MouseLook()
+    {
+        isPlayerLooking = true;
+        cameraYaw += camSpeedH * Input.GetAxis("Mouse X");
+        cameraPitch -= camSpeedV * Input.GetAxis("Mouse Y");
+        playerCamera.transform.eulerAngles = new Vector3(cameraPitch, cameraYaw, 0f);
+    }
 
     private void RotatePlayerCW()
     {
