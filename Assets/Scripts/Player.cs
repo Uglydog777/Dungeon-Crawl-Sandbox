@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] Camera playerCamera;
+    [SerializeField] Camera playerCamera = null; // unity dose not complain 
     [SerializeField] float moveSpeed = 10f;
     [SerializeField] float rotSpeed = 10f;
     [SerializeField] float playerCameraHight = 10f;
@@ -18,16 +18,14 @@ public class Player : MonoBehaviour
     Quaternion targetPlayerRotation;
     [SerializeField] bool isMoving = false;
     [SerializeField] bool isPlayerLooking = false;
+   
     // for camera look
-    [SerializeField] float camLookSpeed = 2.0f;
-    
+    [SerializeField] float camLookSpeed = 2.0f;   
     float cameraYaw = 0f;
     float cameraPitch = 0f;
-
     Vector2 curMousePos;
 
     enum direction {north, south, east, west };
-
     direction playerFacing;
    
     // Start is called before the first frame update
@@ -45,7 +43,7 @@ public class Player : MonoBehaviour
 
         GetComponent<MeshRenderer>().enabled = false; // make player invisible to the camera
        
-        GetPlayerDirection();
+        GetPlayerDirection(); // set the players direction 
         
     }
 
@@ -53,14 +51,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        curMousePos.x += Input.GetAxis("Mouse X");
-        //curMousePos.x = Input.mousePosition.x;
-        curMousePos.y += -Input.GetAxis("Mouse Y");
-        //curMousePos.y = Input.mousePosition.y;
         print(playerFacing);
         PlayerInput();
         UpdateCamAndPlayer();
-
     }
 
     private void GetPlayerDirection()
@@ -68,25 +61,25 @@ public class Player : MonoBehaviour
         if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 0)
         {
             playerFacing = direction.north;
-            cameraYaw = 0f;
+            cameraYaw = 0f; // reset yaw for next mouse look
             
         }
         if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 270)
         {
             playerFacing = direction.west;
-            cameraYaw = -90f;
+            cameraYaw = -90f; // reset yaw for next mouse look
         }
         if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 180)
         {
             playerFacing = direction.south;
-            cameraYaw = 180f;
+            cameraYaw = 180f; // reset yaw for next mouse look
         }
         if (Mathf.Floor(GetComponent<Transform>().eulerAngles.y) == 90)
         {
             playerFacing = direction.east;
-            cameraYaw = 90f;
+            cameraYaw = 90f; // reset yaw for next mouse look
         }
-        cameraPitch = 0f;
+        cameraPitch = 0f; // reset pitch for next mouse look
     }
 
     private void UpdateCamAndPlayer()
@@ -142,18 +135,19 @@ public class Player : MonoBehaviour
             }
 
         }
+        // mouse look
         if(Input.GetKey(KeyCode.L))
         {
             if (isPlayerLooking == false)
             {
                 isMoving = true;
             }
-            GetPlayerDirection();
             MouseLook();
         }
         else if (!Input.GetKey(KeyCode.L) && isPlayerLooking == true)
         {
             isPlayerLooking = false;   
+            GetPlayerDirection();
         }
 
     }
@@ -161,12 +155,11 @@ public class Player : MonoBehaviour
     private void MouseLook()
     {
         isPlayerLooking = true;
-        if (cameraYaw < 180f && cameraYaw > -180f)
-        {
-            cameraYaw += camLookSpeed * curMousePos.x;
-            cameraPitch += camLookSpeed * curMousePos.y;
-            playerCamera.transform.rotation = Quaternion.Euler(cameraPitch, cameraYaw, 0f);
-        }
+
+        cameraYaw += Input.GetAxis("Mouse X") * camLookSpeed;
+        cameraPitch -= Input.GetAxis("Mouse Y") * camLookSpeed;
+        playerCamera.transform.rotation = Quaternion.Euler(cameraPitch, cameraYaw, 0f);
+        
     }
 
     private void RotatePlayerCW()
