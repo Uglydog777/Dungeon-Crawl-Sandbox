@@ -21,8 +21,8 @@ public class Player : MonoBehaviour
    
     // for camera look
     [SerializeField] float camLookSpeed = 2.0f;   
-    float cameraYaw = 0f;
-    float cameraPitch = 0f;
+    [SerializeField]float cameraYaw = 0f;
+    [SerializeField]float cameraPitch = 0f;
     Vector2 curMousePos;
 
     enum direction {north, south, east, west };
