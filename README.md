@@ -10,3 +10,6 @@ Legend of Grimrock.
 (A) turn left
 (D) turn right
 (L) activate mouse look
+
+
+![](Screenshots/screenshot1.PNG)
