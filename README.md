@@ -1,4 +1,6 @@
 # dungeon-crawl-sandbox
+![](Screenshots/screenshot1.PNG)
+
 playing around with making a turn-ish based first person dungeon crawler
 
 
@@ -11,5 +13,3 @@ Legend of Grimrock.
 (D) turn right
 (L) activate mouse look
 
-
-![](Screenshots/screenshot1.PNG)
